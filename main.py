@@ -20,7 +20,7 @@ CALLBACK_TODAY = "today"
 CALLBACK_TOMORROW = "tomorrow"
 CALLBACK_WEEK = "week"
 CALLBACK_YEAR = "year"
-call = "aries"
+
 ARIES_STICKER = "CAACAgIAAxkBAAEBDWVfDhLfznQ1rl_IOdPCnf60sVyvZwACKAEAAoe3Gh6YjT7bQrknhxoE"
 TAURUS_STICKER = "CAACAgIAAxkBAAEBDWdfDhLnclk1eK4zNPPLf_icjZMDIQACKQEAAoe3Gh5k2dCHG6b86BoE"
 GEMINI_STICKER = "CAACAgIAAxkBAAEBDXZfDhSx5zfktPQZ0M7wet61TB1crAACKgEAAoe3Gh5FWhhLZKpSXxoE"
@@ -52,17 +52,6 @@ def generate_keyboard():
             InlineKeyboardButton("♑ Козерог", callback_data=CALLBACK_CAPRICORN),
             InlineKeyboardButton("♒ Водолец", callback_data=CALLBACK_AQUARIUS),
             InlineKeyboardButton("♓ Рыбы", callback_data=CALLBACK_PISCES)],
-    ]
-
-    return InlineKeyboardMarkup(keyboard)
-
-
-def generate_keyboard2():
-    keyboard = [
-        [InlineKeyboardButton("Гороскоп на сегодня", callback_data=CALLBACK_TODAY), ],
-        [InlineKeyboardButton("Гороскоп на завтра", callback_data=CALLBACK_TOMORROW), ],
-        [InlineKeyboardButton("Гороскоп на неделю", callback_data=CALLBACK_WEEK), ],
-        [InlineKeyboardButton("Гороскоп на год", callback_data=CALLBACK_YEAR), ],
     ]
 
     return InlineKeyboardMarkup(keyboard)
@@ -249,43 +238,6 @@ def keyboard_regulate(update: Update, context):
         )
 
 
-def keyboard_regulate2(update: Update, context):
-    query2 = update.callback_query
-    current_callback2 = query2.data
-
-    chat_id1 = update.effective_message.chat_id
-
-    query2.edit_message_text(
-        text=update.effective_message.text
-    )
-
-    if current_callback2 == CALLBACK_TODAY:
-        r = requests.get('https://1001goroskop.ru/?znak=aries')
-        html = BS(r.content, "html.parser")
-        text = html.p
-        print(text)
-
-    if current_callback2 == CALLBACK_TOMORROW:
-        context.bot.send_sticker(
-            chat_id=chat_id1,
-            sticker=TAURUS_STICKER,
-            reply_markup=generate_keyboard2()
-        )
-    if current_callback2 == CALLBACK_WEEK:
-        context.bot.send_sticker(
-            chat_id=chat_id1,
-            sticker=GEMINI_STICKER,
-            reply_markup=generate_keyboard2()
-        )
-
-    if current_callback2 == CALLBACK_YEAR:
-        context.bot.send_sticker(
-            chat_id=chat_id1,
-            sticker=CANCER_STICKER,
-            reply_markup=generate_keyboard2()
-        )
-
-
 def hello(update: Update, context):
     context.bot.send_message(
         chat_id=update.effective_message.chat_id,
@@ -325,14 +277,12 @@ def main():
     )
 
     keyboard_handler = CallbackQueryHandler(callback=keyboard_regulate, pass_chat_data=True)
-    keyboard_handler2 = CallbackQueryHandler(callback=keyboard_regulate2, pass_chat_data=True)
     my_handler = MessageHandler(Filters.all, hello)
     my_handler2 = MessageHandler(Filters.text, error)
     start_handler = CommandHandler("start", start)
     help_handler = CommandHandler("help", help)
 
     my_update.dispatcher.add_handler(keyboard_handler)
-    my_update.dispatcher.add_handler(keyboard_handler2)
     my_update.dispatcher.add_handler(start_handler)
     my_update.dispatcher.add_handler(help_handler)
     my_update.dispatcher.add_handler(my_handler2)
